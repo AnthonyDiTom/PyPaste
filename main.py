@@ -30,16 +30,15 @@ def monitor_clipboard():
         if text != last_text:
             last_text = text
             add_menu_item(text)
-        time.sleep(3)
+        time.sleep(2)
         
-
 def add_menu_item(text):
 
     if len(menu_items) == len(data) + 3:
        menu_items.insert(-2, Menu.SEPARATOR)
        menu_items.insert(-2, MenuItem('Delete pastboard history', reset_menu))
 
-    truncated_text = text[:50] + '...' if len(text) > 20 else text
+    truncated_text = text[:50] + '...' if len(text) > 50 else text
     if not any(item.text == text for item in menu_items):
         menu_items.insert(-4, MenuItem(truncated_text.strip(), partial(on_copy, text=text)))
         
