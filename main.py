@@ -16,10 +16,9 @@ def on_quit(icon, item):
     icon.stop()
 
 def reset_menu(icon, item):
-    menu_items = constuct_menu()
+    menu_items = constuct_menu(data)
     icon.menu = Menu(*menu_items)
     icon.update_menu()
-
 
 def on_copy(icon, item, text):
     pyperclip.copy(text)
@@ -35,6 +34,11 @@ def monitor_clipboard():
         
 
 def add_menu_item(text):
+
+    if len(menu_items) == len(data) + 3:
+       menu_items.insert(-2, Menu.SEPARATOR)
+       menu_items.insert(-2, MenuItem('Delete pastboard history', reset_menu))
+
     truncated_text = text[:50] + '...' if len(text) > 20 else text
     if not any(item.text == text for item in menu_items):
         menu_items.insert(-4, MenuItem(truncated_text.strip(), partial(on_copy, text=text)))
@@ -42,22 +46,18 @@ def add_menu_item(text):
     icon.menu = Menu(*menu_items)
     icon.update_menu()
 
-def constuct_menu():
-    with open('values.json', 'r') as file:
-        data = json.load(file)
-
+def constuct_menu(data):
     items = [Menu.SEPARATOR]
-
     for entry in data:
         items.insert(-1, MenuItem(entry['title'], partial(on_copy, text=entry['text'])))
-    items.append(Menu.SEPARATOR)
-    items.append(MenuItem('Delete pastboard history', reset_menu))
     items.append(Menu.SEPARATOR)
     items.append(MenuItem('Quit', on_quit))
 
     return items
 
-menu_items = constuct_menu()
+with open('values.json', 'r') as file:
+    data = json.load(file)
+menu_items = constuct_menu(data)
 
 icon = Icon("CopyPaste", get_icon(), "CopyPaste", Menu(*menu_items))
 
