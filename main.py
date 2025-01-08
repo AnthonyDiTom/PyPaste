@@ -24,12 +24,15 @@ def monitor_clipboard():
         text = pyperclip.paste()
         if text != last_text:
             last_text = text
-            truncated_text = text[:50] + '...' if len(text) > 20 else text
-            if not any(item.text == text for item in menu_items):
-                menu_items.insert(-2, MenuItem(truncated_text, partial(on_copy, text=text)))
-            icon.menu = Menu(*menu_items)
-            icon.update_menu()
+            add_menu_item(text)
         time.sleep(3)
+
+def add_menu_item(text):
+    truncated_text = text[:50] + '...' if len(text) > 20 else text
+    if not any(item.text == text for item in menu_items):
+        menu_items.insert(-2, MenuItem(truncated_text, partial(on_copy, text=text)))
+    icon.menu = Menu(*menu_items)
+    icon.update_menu()
 
 def constuct_menu():
     with open('values.json', 'r') as file:
