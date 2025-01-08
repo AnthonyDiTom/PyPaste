@@ -24,11 +24,11 @@ def monitor_clipboard():
     while True:
         print("Monitoring clipboard...")
         text = pyperclip.paste()
-        
         if text != last_text:
             last_text = text
+            truncated_text = text[:50] + '...' if len(text) > 20 else text
             if not any(item.text == text for item in menu_items):
-                menu_items.insert(-2, MenuItem(text, partial(on_copy, text=text)))
+                menu_items.insert(-2, MenuItem(truncated_text, partial(on_copy, text=text)))
             icon.menu = Menu(*menu_items)
             icon.update_menu()
         time.sleep(5)
@@ -37,6 +37,7 @@ with open('values.json', 'r') as file:
     data = json.load(file)
 
 menu_items = [Menu.SEPARATOR]
+
 for entry in data:
     menu_items.insert(-2, MenuItem(entry['title'], partial(on_copy, text=entry['text'])))
 
