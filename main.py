@@ -15,6 +15,12 @@ def get_icon():
 def on_quit(icon, item):
     icon.stop()
 
+def reset_menu(icon, item):
+    menu_items = constuct_menu()
+    icon.menu = Menu(*menu_items)
+    icon.update_menu()
+
+
 def on_copy(icon, item, text):
     pyperclip.copy(text)
 
@@ -26,11 +32,13 @@ def monitor_clipboard():
             last_text = text
             add_menu_item(text)
         time.sleep(3)
+        
 
 def add_menu_item(text):
     truncated_text = text[:50] + '...' if len(text) > 20 else text
     if not any(item.text == text for item in menu_items):
-        menu_items.insert(-2, MenuItem(truncated_text, partial(on_copy, text=text)))
+        menu_items.insert(-4, MenuItem(truncated_text.strip(), partial(on_copy, text=text)))
+        
     icon.menu = Menu(*menu_items)
     icon.update_menu()
 
@@ -42,7 +50,8 @@ def constuct_menu():
 
     for entry in data:
         items.insert(-1, MenuItem(entry['title'], partial(on_copy, text=entry['text'])))
-
+    items.append(Menu.SEPARATOR)
+    items.append(MenuItem('Delete pastboard history', reset_menu))
     items.append(Menu.SEPARATOR)
     items.append(MenuItem('Quit', on_quit))
 
