@@ -20,9 +20,7 @@ def on_copy(icon, item, text):
 
 def monitor_clipboard():
     last_text = ""
-    
     while True:
-        print("Monitoring clipboard...")
         text = pyperclip.paste()
         if text != last_text:
             last_text = text
@@ -31,23 +29,27 @@ def monitor_clipboard():
                 menu_items.insert(-2, MenuItem(truncated_text, partial(on_copy, text=text)))
             icon.menu = Menu(*menu_items)
             icon.update_menu()
-        time.sleep(5)
+        time.sleep(3)
 
-with open('values.json', 'r') as file:
-    data = json.load(file)
+def constuct_menu():
+    with open('values.json', 'r') as file:
+        data = json.load(file)
 
-menu_items = [Menu.SEPARATOR]
+    items = [Menu.SEPARATOR]
 
-for entry in data:
-    menu_items.insert(-2, MenuItem(entry['title'], partial(on_copy, text=entry['text'])))
+    for entry in data:
+        items.insert(-1, MenuItem(entry['title'], partial(on_copy, text=entry['text'])))
 
-menu_items.append(Menu.SEPARATOR)
-menu_items.append(MenuItem('Quit', on_quit))
+    items.append(Menu.SEPARATOR)
+    items.append(MenuItem('Quit', on_quit))
 
-menu = Menu(*menu_items)
-icon = Icon("CopyPaste", get_icon(), "CopyPaste", menu)
+    return items
 
-# Start the clipboard monitoring in a separate thread
+menu_items = constuct_menu()
+
+icon = Icon("CopyPaste", get_icon(), "CopyPaste", Menu(*menu_items))
+
 clipboard_thread = Thread(target=monitor_clipboard, daemon=True)
 clipboard_thread.start()
+
 icon.run()
